@@ -43,14 +43,17 @@ import static android.R.id.message;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainFragment extends Fragment {
-    // Global variables for xml data
-    private final int READ_TIMEOUT = 10000; // time is in milliseconds
-    private final int CONNECT_TIMEOUT = 15000; // time is in milliseconds
-    private String url = "http://www.cbc.ca/cmlink/rss-topstories";
-    private List<NewsItem> contents = new ArrayList<NewsItem>();
 
-    // Global variables for fragment data
+    private final String URL = "https://www.cbc.ca/cmlink/rss-topstories";
+
+    private final int READ_TIMEOUT = 10_000; // milliseconds
+
+    private final int CONNECT_TIMEOUT = 15_000; // milliseconds
+
+    private List<NewsItem> contents = new ArrayList<>();
+
     private RecyclerView mRecyclerView;
+
     private NewsAdapter mAdapter;
 
     @Override
@@ -60,12 +63,10 @@ public class MainFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-
         // Load the recyclerview fragment layout and create the recyclerview object
         View view = inflater.inflate(R.layout.fragment_recycler_view, parent, false);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.list_recycler_view);
+        mRecyclerView = view.findViewById(R.id.list_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
 
         if (isNetworkAvailable()) {
             // Download XML file from url
@@ -98,10 +99,7 @@ public class MainFragment extends Fragment {
 
         // if no network is available networkInfo will be null
         // otherwise check if we are connected
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
@@ -110,7 +108,7 @@ public class MainFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
-                xmlData = downloadUrl(url);
+                xmlData = downloadUrl();
                 return xmlData;
             } catch (IOException e) {
                 return "Unable to retrieve web page. URL may be invalid.";
@@ -127,11 +125,11 @@ public class MainFragment extends Fragment {
     // Given a URL, establishes an HttpUrlConnection and retrieves
     // the web page content as a InputStream, which it returns as
     // a string.
-    private String downloadUrl(String myurl) throws IOException {
+    private String downloadUrl() throws IOException {
         InputStream is = null;
 
         try {
-            URL url = new URL(myurl);
+            URL url = new URL(URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(READ_TIMEOUT);
             conn.setConnectTimeout(CONNECT_TIMEOUT);
